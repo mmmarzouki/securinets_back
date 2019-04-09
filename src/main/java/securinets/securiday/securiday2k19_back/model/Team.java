@@ -1,6 +1,6 @@
 package securinets.securiday.securiday2k19_back.model;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -34,5 +34,8 @@ public class Team {
     private String password;
 
     @OneToMany(mappedBy = "team")
-    private ArrayList<Submission> submissions;
+    private List<Submission> submissions;
+
+    @Column(name = "score")
+    private int score;
 }
