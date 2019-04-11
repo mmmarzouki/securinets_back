@@ -31,6 +31,9 @@ public class Submission {
     @Column(name = "status")
     private String status;
 
+    @Column(name= "score")
+    private int score;
+
     @ManyToOne
     private Team team; 
 }

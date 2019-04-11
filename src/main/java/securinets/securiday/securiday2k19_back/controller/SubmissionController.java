@@ -1,5 +1,6 @@
 package securinets.securiday.securiday2k19_back.controller;
 
+import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -9,7 +10,10 @@ import securinets.securiday.securiday2k19_back.model.Team;
 import securinets.securiday.securiday2k19_back.repositories.SubmissionRepository;
 import securinets.securiday.securiday2k19_back.repositories.TeamRepository;
 
+import javax.servlet.http.HttpServletResponse;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -33,6 +37,12 @@ public class SubmissionController {
     @RequestMapping(path = "/submission", method = RequestMethod.GET)
     public ArrayList<Submission> findAll(){
         return (ArrayList<Submission>) submissionRepository.findAll();
+    }
+
+    @RequestMapping(path = "/submission", method = RequestMethod.PUT)
+    public Submission judge( @RequestBody Submission submission ) {
+        submissionRepository.save(submission);
+        return submission;
     }
 
     @RequestMapping(path = "/submission/{id}", method = RequestMethod.GET)
@@ -69,5 +79,26 @@ public class SubmissionController {
         }
         //return submission
         return submission;
+    }
+
+    @RequestMapping(value="/report/{id}", method=RequestMethod.GET)
+    public void getDownload(HttpServletResponse response, @PathVariable int id) {
+        //get submission
+        Submission submission = submissionRepository.findById(id).get();
+        try {
+            // Get your file stream from wherever.
+            File file = new File(folder.getAbsolutePath()+"/"+submission.getId()+".pdf");
+            InputStream myStream = new FileInputStream(file);
+            // Set the content type and attachment header.
+            response.addHeader("Content-disposition", "attachment;filename=report"+submission.getId()+".pdf");
+            response.setContentType("application/pdf");
+
+            // Copy the stream to the response's output stream.
+                IOUtils.copy(myStream, response.getOutputStream());
+                response.flushBuffer();
+            }
+        catch (Exception ex){
+            ex.printStackTrace();
+        }
     }
 }
