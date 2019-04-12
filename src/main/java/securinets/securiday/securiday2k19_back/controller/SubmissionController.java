@@ -42,6 +42,13 @@ public class SubmissionController {
     @RequestMapping(path = "/submission", method = RequestMethod.PUT)
     public Submission judge( @RequestBody Submission submission ) {
         submissionRepository.save(submission);
+
+        if(submission.getStatus()==Status.ACCEPTED){
+            Team team = submission.getTeam();
+            team.setScore(team.getScore()+submission.getScore());
+            teamRepository.save(team);
+        }
+
         return submission;
     }
 
